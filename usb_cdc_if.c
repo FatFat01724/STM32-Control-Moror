@@ -22,8 +22,8 @@
 #include "usbd_cdc_if.h"
 
 /* USER CODE BEGIN INCLUDE */
-extern uint8_t receive_data[128];
-extern uint8_t usb_data_flag;
+extern uint8_t au8_receive_data[128];
+extern uint8_t u8_usb_data_flag;
 
 /* USER CODE END INCLUDE */
 
@@ -265,8 +265,8 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
   USBD_CDC_ReceivePacket(&hUsbDeviceFS);
 	if(*Len !=0)
 	{
-	memcpy(receive_data, UserRxBufferFS, *Len);
-	usb_data_flag = 1;
+	memcpy(au8_receive_data, UserRxBufferFS, *Len);
+	u8_usb_data_flag = 1;
 	}
   return (USBD_OK);
   /* USER CODE END 6 */

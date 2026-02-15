@@ -28,91 +28,89 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-volatile uint8_t data_recieved_flag=0;
-volatile uint8_t mode_001_flag=0;
-volatile uint8_t mode_000_flag=0;
-volatile uint8_t mode_010_flag=0;
-volatile uint8_t mode_011_flag=0;
-volatile uint8_t mode_012_flag=0;
-volatile uint8_t mode_013_flag=0;
-volatile uint8_t mode_014_flag=0;
-volatile uint8_t mode_020_flag=0;
-volatile uint8_t mode_021_flag=0;
-volatile uint8_t mode_022_flag=0;
-volatile uint8_t mode_023_flag=0;
-volatile uint8_t SRAM_Flag=0;
+volatile uint8_t u8_data_recieved_flag=0;
+volatile uint8_t u8_mode_001_flag=0;
+volatile uint8_t u8_mode_000_flag=0;
+volatile uint8_t u8_mode_010_flag=0;
+volatile uint8_t u8_mode_011_flag=0;
+volatile uint8_t u8_mode_012_flag=0;
+volatile uint8_t u8_mode_013_flag=0;
+volatile uint8_t u8_mode_014_flag=0;
+volatile uint8_t u8_mode_020_flag=0;
+volatile uint8_t u8_mode_021_flag=0;
+volatile uint8_t u8_mode_022_flag=0;
+volatile uint8_t u8_mode_023_flag=0;
+volatile uint8_t u8_SRAM_Flag=0;
 
 
-volatile uint8_t span_flag = 0;
-volatile uint8_t page_index=0;
-volatile uint8_t usb_data_flag;
+volatile uint8_t u8_span_flag = 0;
+volatile uint8_t u8_page_index=0;
+volatile uint8_t u8_usb_data_flag;
 
-volatile short calibrated_pulse = 937;
-volatile short calibrated_pulse_read = 0;
-volatile uint8_t zero_calib=0;
-volatile uint8_t span_calib=0;
+volatile int16_t s16_calibrated_pulse = 937;
+volatile int16_t s16_calibrated_pulse_read = 0;
+volatile uint8_t u8_zero_calib=0;
+volatile uint8_t u8_span_calib=0;
 
 
-volatile short pulse=0;
+volatile int16_t s16_pulse=0;
 volatile float f_Mea_Now, f_Err_Now = 0, f_Err_Pre = 0;
 volatile static float f_Int = 0, f_Der = 0;
 volatile float f_SP = 937, f_Kp, f_Ki, f_Kd;
 volatile float f_Del = 0.02;
-volatile int i_Out;
-volatile float output;
+volatile int32_t s32_Out;
+volatile float f_output;
 
-uint16_t pwmValue;
-uint16_t data_Poi_None_PID;
-uint16_t data_Pulse_None_PID;
+uint16_t u16_pwmValue;
+uint16_t u16_data_Poi_None_PID;
+uint16_t u16_data_Pulse_None_PID;
 
-uint8_t spi_buffer[2];
-uint8_t data_RX[15]={0};
-float data_PID[3]={0};
-uint8_t data_PID_buff[6]={0};
-uint8_t data_Poi[4]={0};
-uint8_t data_TX[63];
-uint8_t calibrated_pulse_read_raw[4]={0};
-uint8_t data_DAC[4]={0};
-uint16_t DAC_Value;
-uint32_t PT100_value = 0;
+uint8_t au8_spi_buffer[2];
+uint8_t au8_data_RX[15]={0};
+float f_data_PID[3]={0};
+uint8_t au8_data_PID_buff[6]={0};
+uint8_t au8_data_Poi[4]={0};
+uint8_t au8_data_TX[63];
+uint8_t au8_calibrated_pulse_read_raw[4]={0};
+uint8_t au8_data_DAC[4]={0};
 
-uint16_t holdTime=0;
-uint16_t data_counter=0;
-uint8_t data_pointer=0;
-uint16_t page_counter=0;
-uint16_t page_reader=0;
-char data_array[5];
-uint8_t data_motor_write[64];
-uint8_t data_motor_read[60];
-uint8_t data_motor_read_2[64];
+uint16_t u16_DAC_Value;
+uint32_t u32_PT100_value = 0;
+
+uint16_t u16_holdTime=0;
+uint16_t u16_data_counter=0;
+uint8_t u8_data_pointer=0;
+uint16_t u8_page_counter=0;
+uint16_t u8_page_reader=0;
+char achr_data_array[5];
+uint8_t au8_data_motor_write[64];
+uint8_t au8_data_motor_read[60];
 
 #define EEPROM_ADDR 0x50 << 1
 #define MCP4725_ADDR 0xC0
 
-uint8_t data[] = "zMy name is Phat\r\n{";
-uint8_t data_trans1[] = "LED_1_ON \n";
-uint8_t data_trans11[] = "LED_1_OFF \n";
-uint8_t data_trans2[] = "LED_2_ON \n";
-uint8_t data_trans22[] = "LED_2_OFF \n";
-uint8_t data_trans3[] = "LED_3_ON \n";
-uint8_t data_trans33[] = "LED_3_OFF \n";
-uint8_t data_trans4[] = "MOTOR_IS_RUNNING \n";
-uint8_t data_trans44[] = "MOTOR_IS_STOPPING \n";
-uint8_t data_trans5[] = "Zero Calibrated\n";
-uint8_t data_trans6[] = "Span Calibrated\n";
+uint8_t au8_data_trans1[] = "LED_1_ON \n";
+uint8_t au8_data_trans11[] = "LED_1_OFF \n";
+uint8_t au8_data_trans2[] = "LED_2_ON \n";
+uint8_t au8_data_trans22[] = "LED_2_OFF \n";
+uint8_t au8_data_trans3[] = "LED_3_ON \n";
+uint8_t au8_data_trans33[] = "LED_3_OFF \n";
+uint8_t au8_data_trans4[] = "MOTOR_IS_RUNNING \n";
+uint8_t au8_data_trans44[] = "MOTOR_IS_STOPPING \n";
+uint8_t au8_data_trans5[] = "Zero Calibrated\n";
+uint8_t au8_data_trans6[] = "Span Calibrated\n";
 
 uint8_t bSTX=0x02;
 uint8_t bETX=0x03;
-uint8_t receivedByte=0;
-uint8_t isReceiving=0;
-uint8_t uartrecvalue[128];
-uint8_t receive_data[128];
+uint8_t u8_isReceiving=0;
+uint8_t au8_uartrecvalue[128];
+uint8_t au8_receive_data[128];
 
-uint8_t pulse_read [3]={0};
-uint8_t data_led[3]={0};
-uint8_t color_led;
+uint8_t au8_pulse_read [3]={0};
+uint8_t au8_data_led[3]={0};
+uint8_t u8_color_led;
 
-uint16_t PT100_index = 0;
+uint16_t u16_PT100_index = 0;
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -230,8 +228,8 @@ int main(void)
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_4);
 	
-	HAL_ADC_Start_DMA(&hadc1, &PT100_value, 1);
-	//HAL_UART_Receive_DMA(&huart1, uartrecvalue,15);
+	HAL_ADC_Start_DMA(&hadc1, &u32_PT100_value, 1);
+	//HAL_UART_Receive_DMA(&huart1, au8_uartrecvalue,15);
 	HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_1|TIM_CHANNEL_2);
 	MAX7219_Init();
 	SRAM_GPIO_Init();
@@ -243,97 +241,97 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-		if(usb_data_flag==1)
+		if(u8_usb_data_flag==1)
 		{
 			Process_data();
-			if(mode_001_flag ==1)
+			if(u8_mode_001_flag ==1)
 			{
-				mode_001_flag = 0;
+				u8_mode_001_flag = 0;
 				HAL_GPIO_WritePin(GPIOB,GPIO_PIN_14,0);
 				HAL_GPIO_WritePin(GPIOB,GPIO_PIN_15,1);
-				pwmValue =atoi((char*)data_RX);
-				MAX7219_SendData(3,pwmValue/100);	
-				MAX7219_SendData(2,((pwmValue)/10)%10);	
-				MAX7219_SendData(1,pwmValue%10);		
-				__HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_1,pwmValue);
+				u16_pwmValue =atoi((char*)au8_data_RX);
+				MAX7219_SendData(3,u16_pwmValue/100);	
+				MAX7219_SendData(2,((u16_pwmValue)/10)%10);	
+				MAX7219_SendData(1,u16_pwmValue%10);		
+				__HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_1,u16_pwmValue);
 				__HAL_TIM_SET_COUNTER(&htim2, 0);
-				usb_data_flag =0;
+				u8_usb_data_flag =0;
 			}
 			
-			if(mode_010_flag ==1)
+			if(u8_mode_010_flag ==1)
 			{
-				uint32_t holdTime = 0;
+				uint32_t u16_holdTime = 0;
 				uint32_t lastTime = 0;
-				HAL_I2C_Mem_Read(&hi2c1, EEPROM_ADDR, 32704, 2, calibrated_pulse_read_raw, 4, 1000);
+				HAL_I2C_Mem_Read(&hi2c1, EEPROM_ADDR, 32704, 2, au8_calibrated_pulse_read_raw, 4, 1000);
 				HAL_Delay(5);
-				calibrated_pulse_read = calibrated_pulse_read_raw[1]<<8 | (calibrated_pulse_read_raw[2]);
-				if(calibrated_pulse_read != 0)
+				s16_calibrated_pulse_read = au8_calibrated_pulse_read_raw[1]<<8 | (au8_calibrated_pulse_read_raw[2]);
+				if(s16_calibrated_pulse_read != 0)
 				{
-					calibrated_pulse = calibrated_pulse_read;
-					memset(data_TX, 0, sizeof(data_TX));
-					sprintf((char*)data_TX,"%c%c%u%c",bSTX,'E',calibrated_pulse,bETX);
-					CDC_Transmit_FS(data_TX,7);					
+					s16_calibrated_pulse = s16_calibrated_pulse_read;
+					memset(au8_data_TX, 0, sizeof(au8_data_TX));
+					sprintf((char*)au8_data_TX,"%c%c%u%c",bSTX,'E',s16_calibrated_pulse,bETX);
+					CDC_Transmit_FS(au8_data_TX,7);					
 				}
-				data_Poi[3] = '\0';
-				data_Poi_None_PID = atoi((char*)data_Poi);
-				data_Pulse_None_PID = (data_Poi_None_PID)*((double)calibrated_pulse/360.0);
+				au8_data_Poi[3] = '\0';
+				u16_data_Poi_None_PID = atoi((char*)au8_data_Poi);
+				u16_data_Pulse_None_PID = (u16_data_Poi_None_PID)*((double)s16_calibrated_pulse/360.0);
 
 				while(1)
 				{
-					pulse = __HAL_TIM_GET_COUNTER(&htim2); 
-					memset(data_TX, 0, sizeof(data_TX));
-					sprintf((char*)data_TX,"%c%c%u",bSTX,'D',pulse);
-					data_TX[9] = bETX;
-					CDC_Transmit_FS(data_TX,10);					
-					if (pulse<=0) 
+					s16_pulse = __HAL_TIM_GET_COUNTER(&htim2); 
+					memset(au8_data_TX, 0, sizeof(au8_data_TX));
+					sprintf((char*)au8_data_TX,"%c%c%u",bSTX,'D',s16_pulse);
+					au8_data_TX[9] = bETX;
+					CDC_Transmit_FS(au8_data_TX,10);					
+					if (s16_pulse<=0) 
 					{
 						Forward_Turning(400);
-						holdTime=0;
+						u16_holdTime=0;
 					}
-					else if (pulse < (data_Pulse_None_PID)*0.98)
+					else if (s16_pulse < (u16_data_Pulse_None_PID)*0.98)
 					{ 
 						Forward_Turning(400);
-						holdTime=0;
+						u16_holdTime=0;
 					}
-					else if (pulse > (data_Pulse_None_PID)*1.02)
+					else if (s16_pulse > (u16_data_Pulse_None_PID)*1.02)
 					{
 						Reverse_Turning(400);
-						holdTime=0;
+						u16_holdTime=0;
 					}
-					else if (pulse >=(data_Pulse_None_PID)*0.98 && pulse <= (data_Pulse_None_PID)*1.02)
+					else if (s16_pulse >=(u16_data_Pulse_None_PID)*0.98 && s16_pulse <= (u16_data_Pulse_None_PID)*1.02)
 					{
 						Stop_Turning();
-						if(pulse < (data_Pulse_None_PID)*0.98 || pulse >(data_Pulse_None_PID)*1.02)
+						if(s16_pulse < (u16_data_Pulse_None_PID)*0.98 || s16_pulse >(u16_data_Pulse_None_PID)*1.02)
 						{
 							break;
 						}
 						uint32_t currentTime = HAL_GetTick();
 								if (currentTime - lastTime >= 100) 
 								{
-										holdTime += 100;
+										u16_holdTime += 100;
 										lastTime = currentTime;
 								}
 
-								if (holdTime >= 3000)
+								if (u16_holdTime >= 3000)
 								{
 										Stop_Turning();
-										mode_010_flag = 0; 
-										usb_data_flag =0;
+										u8_mode_010_flag = 0; 
+										u8_usb_data_flag =0;
 										HAL_TIM_Base_Stop_IT(&htim4);
 										
 										beep(4095, 100);
 										beep(4095, 100);
 										beep(4095, 100);
 									
-										if(SRAM_Flag == 1)
+										if(u8_SRAM_Flag == 1)
 										{
 											for (uint8_t addr = 0; addr < 4; addr++) 
 											{
 												uint8_t value = SRAM_ReadByte(addr);
-												data_DAC[addr]= value;
+												au8_data_DAC[addr]= value;
 											}
-											DAC_Value =atoi((char*)data_DAC);
-											MCP4725_Write(DAC_Value);
+											u16_DAC_Value =atoi((char*)au8_data_DAC);
+											MCP4725_Write(u16_DAC_Value);
 										}
 										break;
 								}		
@@ -341,46 +339,46 @@ int main(void)
 				}	
 			}
 
-			if(mode_011_flag ==1)
+			if(u8_mode_011_flag ==1)
 			{
-				uint32_t holdTime = 0;
+				uint32_t u16_holdTime = 0;
 				uint32_t lastTime = 0;
 				uint32_t lastMea = 0;  
-				HAL_I2C_Mem_Read(&hi2c1, EEPROM_ADDR, 32704, 2, calibrated_pulse_read_raw, 4, 1000);
+				HAL_I2C_Mem_Read(&hi2c1, EEPROM_ADDR, 32704, 2, au8_calibrated_pulse_read_raw, 4, 1000);
 				HAL_Delay(5);
-				calibrated_pulse_read = calibrated_pulse_read_raw[1]<<8 | (calibrated_pulse_read_raw[2]);
-				if(calibrated_pulse_read != 0)
+				s16_calibrated_pulse_read = au8_calibrated_pulse_read_raw[1]<<8 | (au8_calibrated_pulse_read_raw[2]);
+				if(s16_calibrated_pulse_read != 0)
 				{
-					calibrated_pulse = calibrated_pulse_read;
+					s16_calibrated_pulse = s16_calibrated_pulse_read;
 				}
 				while(1)
 				{
 					f_Mea_Now = __HAL_TIM_GET_COUNTER(&htim2);
-					memset(data_TX, 0, sizeof(data_TX));
-					sprintf((char*)data_TX,"%c%c%u",bSTX,'D',(int)f_Mea_Now);
-					data_TX[6] = bETX;
-					CDC_Transmit_FS(data_TX,7);
+					memset(au8_data_TX, 0, sizeof(au8_data_TX));
+					sprintf((char*)au8_data_TX,"%c%c%u",bSTX,'D',(int)f_Mea_Now);
+					au8_data_TX[6] = bETX;
+					CDC_Transmit_FS(au8_data_TX,7);
 					//MAX7219_SendData(3, (int)(f_Mea_Now/100));
 					//MAX7219_SendData(2, (int)(f_Mea_Now/10)%10);
 					//MAX7219_SendData(1, (int)(f_Mea_Now)%10);
 
-					if (f_Mea_Now >=(calibrated_pulse)*0.98 && f_Mea_Now <= (calibrated_pulse)*1.02)
+					if (f_Mea_Now >=(s16_calibrated_pulse)*0.98 && f_Mea_Now <= (s16_calibrated_pulse)*1.02)
 					{
-						if(f_Mea_Now < (calibrated_pulse)*0.98 && f_Mea_Now > (calibrated_pulse)*1.02)
+						if(f_Mea_Now < (s16_calibrated_pulse)*0.98 && f_Mea_Now > (s16_calibrated_pulse)*1.02)
 						{
 							break;  
 						}
 						uint32_t currentTime = HAL_GetTick();
 						if (currentTime - lastTime >= 100)
 						{
-							holdTime += 100;
+							u16_holdTime += 100;
 							lastTime = currentTime;
 						}
-						if (holdTime >= 3000)
+						if (u16_holdTime >= 3000)
 						{
 							Stop_Turning();
-							mode_011_flag = 0;
-							usb_data_flag =0;
+							u8_mode_011_flag = 0;
+							u8_usb_data_flag =0;
 							HAL_TIM_Base_Stop_IT(&htim4);
 							beep(4095, 100);
 							beep(4095, 100);
@@ -390,103 +388,103 @@ int main(void)
 					}
 				}
 			}
-			if(mode_012_flag ==1)
+			if(u8_mode_012_flag ==1)
 			{
-				for (page_reader = 0; page_reader <= 576; page_reader+=64)
+				for (u8_page_reader = 0; u8_page_reader <= 576; u8_page_reader+=64)
 				{
-					HAL_I2C_Mem_Read(&hi2c1, EEPROM_ADDR, page_reader, 2, data_motor_read, sizeof(data_motor_read), 1000);
+					HAL_I2C_Mem_Read(&hi2c1, EEPROM_ADDR, u8_page_reader, 2, au8_data_motor_read, sizeof(au8_data_motor_read), 1000);
 					HAL_Delay(5);
-					data_TX[0]=bSTX;
-					data_TX[1]='P';
-					memcpy(&data_TX[2], data_motor_read, sizeof(data_motor_read));
-					data_TX[62]=bETX;
-					CDC_Transmit_FS(data_TX,sizeof(data_TX));	
+					au8_data_TX[0]=bSTX;
+					au8_data_TX[1]='P';
+					memcpy(&au8_data_TX[2], au8_data_motor_read, sizeof(au8_data_motor_read));
+					au8_data_TX[62]=bETX;
+					CDC_Transmit_FS(au8_data_TX,sizeof(au8_data_TX));	
 				}
-				mode_012_flag=0;	
-				usb_data_flag =0;
+				u8_mode_012_flag=0;	
+				u8_usb_data_flag =0;
 			}		
 			
-			if(mode_013_flag ==1)		
+			if(u8_mode_013_flag ==1)		
 			{
 				__HAL_TIM_SET_COUNTER(&htim2,0);
 				MAX7219_SendData(1,0);
 				MAX7219_SendData(2,0);
 				MAX7219_SendData(3,0);
 				MAX7219_SendData(4,0);				
-				mode_013_flag = 0;
-				usb_data_flag =0;
+				u8_mode_013_flag = 0;
+				u8_usb_data_flag =0;
 			}
 			
-			if(mode_014_flag ==1)		
+			if(u8_mode_014_flag ==1)		
 			{
-				pulse = __HAL_TIM_GET_COUNTER(&htim2);
-				MAX7219_SendData(4, pulse/1000);
-				MAX7219_SendData(3, (pulse/100)%10);
-				MAX7219_SendData(2, (pulse/10)%10);
-				MAX7219_SendData(1, pulse%10);
-				memset(data_TX, 0, sizeof(data_TX));
-				sprintf((char*)data_TX,"%c%c%u",bSTX,'D',pulse);
-				data_TX[9] = bETX;
-				CDC_Transmit_FS(data_TX,10);
+				s16_pulse = __HAL_TIM_GET_COUNTER(&htim2);
+				MAX7219_SendData(4, s16_pulse/1000);
+				MAX7219_SendData(3, (s16_pulse/100)%10);
+				MAX7219_SendData(2, (s16_pulse/10)%10);
+				MAX7219_SendData(1, s16_pulse%10);
+				memset(au8_data_TX, 0, sizeof(au8_data_TX));
+				sprintf((char*)au8_data_TX,"%c%c%u",bSTX,'D',s16_pulse);
+				au8_data_TX[9] = bETX;
+				CDC_Transmit_FS(au8_data_TX,10);
 
-				if(zero_calib == 1)
+				if(u8_zero_calib == 1)
 				{
 					__HAL_TIM_SET_COUNTER(&htim2,0);
-					memset(data_TX, 0, sizeof(data_TX));
-					sprintf((char*)data_TX,"%c%c%s",bSTX,'C',data_trans5);
-					data_TX[15] = bETX;
-					CDC_Transmit_FS(data_TX,sizeof(data_TX));
-					zero_calib = 0;
+					memset(au8_data_TX, 0, sizeof(au8_data_TX));
+					sprintf((char*)au8_data_TX,"%c%c%s",bSTX,'C',au8_data_trans5);
+					au8_data_TX[15] = bETX;
+					CDC_Transmit_FS(au8_data_TX,sizeof(au8_data_TX));
+					u8_zero_calib = 0;
 				}
-				if(span_calib == 1 && zero_calib == 0)
+				if(u8_span_calib == 1 && u8_zero_calib == 0)
 				{
-					calibrated_pulse = __HAL_TIM_GET_COUNTER(&htim2);
-					pulse_read[0] = 0x00;
-					pulse_read[1] = (calibrated_pulse >> 8)& 0xFF;
-					pulse_read[2] = calibrated_pulse & 0xFF;
-					memset(data_TX, 0, sizeof(data_TX));
-					sprintf((char*)data_TX,"%c%c%s",bSTX,'C',data_trans6);
-					data_TX[15U] = bETX;
-					CDC_Transmit_FS(data_TX,sizeof(data_TX));
-					HAL_I2C_Mem_Write(&hi2c1, EEPROM_ADDR, 32704, 2, pulse_read, sizeof(pulse_read), 1000);
+					s16_calibrated_pulse = __HAL_TIM_GET_COUNTER(&htim2);
+					au8_pulse_read[0] = 0x00;
+					au8_pulse_read[1] = (s16_calibrated_pulse >> 8)& 0xFF;
+					au8_pulse_read[2] = s16_calibrated_pulse & 0xFF;
+					memset(au8_data_TX, 0, sizeof(au8_data_TX));
+					sprintf((char*)au8_data_TX,"%c%c%s",bSTX,'C',au8_data_trans6);
+					au8_data_TX[15U] = bETX;
+					CDC_Transmit_FS(au8_data_TX,sizeof(au8_data_TX));
+					HAL_I2C_Mem_Write(&hi2c1, EEPROM_ADDR, 32704, 2, au8_pulse_read, sizeof(au8_pulse_read), 1000);
 					HAL_Delay(5);
-					span_calib = 0;
-					span_flag = 0;			
-					mode_014_flag = 0;
-					usb_data_flag = 0;
+					u8_span_calib = 0;
+					u8_span_flag = 0;			
+					u8_mode_014_flag = 0;
+					u8_usb_data_flag = 0;
 					beep(4095, 100);
 				}
 			}
-			if(mode_020_flag ==1)
+			if(u8_mode_020_flag ==1)
 			{
-				mode_020_flag = 0;
-				pwmValue =atoi((char*)data_led);
-				if(color_led == 'R')
+				u8_mode_020_flag = 0;
+				u16_pwmValue =atoi((char*)au8_data_led);
+				if(u8_color_led == 'R')
 				{
-					__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_1,pwmValue);
+					__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_1,u16_pwmValue);
 				}	
-				else if(color_led == 'G')
+				else if(u8_color_led == 'G')
 				{
-					__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_3,pwmValue);
+					__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_3,u16_pwmValue);
 				}
-				else if(color_led == 'B')
+				else if(u8_color_led == 'B')
 				{
-					__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_4,pwmValue);
+					__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_4,u16_pwmValue);
 				}
-				usb_data_flag =0;
+				u8_usb_data_flag =0;
 			}			
 			
-			if(mode_021_flag ==1)
+			if(u8_mode_021_flag ==1)
 			{
-				mode_021_flag = 0;
-				DAC_Value =atoi((char*)data_DAC);
-				MCP4725_Write(DAC_Value);
-				usb_data_flag =0;
+				u8_mode_021_flag = 0;
+				u16_DAC_Value =atoi((char*)au8_data_DAC);
+				MCP4725_Write(u16_DAC_Value);
+				u8_usb_data_flag =0;
 			}
 
-			if(mode_022_flag ==1)
+			if(u8_mode_022_flag ==1)
 			{
-				usb_data_flag =0;
+				u8_usb_data_flag =0;
 			}					
 		}		
 	}
@@ -986,19 +984,19 @@ void Data_Receive(void)
 {
 	for(int i=0; i<128; i++)
 	{
-		if(receive_data[i] == bSTX)
+		if(au8_receive_data[i] == bSTX)
 		{
-			isReceiving=1;
+			u8_isReceiving=1;
 		}
-		else if(receive_data[i] == bETX && isReceiving)
+		else if(au8_receive_data[i] == bETX && u8_isReceiving)
 		{
-			isReceiving=0;		
+			u8_isReceiving=0;		
 		}
-		else if(isReceiving)
+		else if(u8_isReceiving)
 		{
 			for(int i=1;i<127;i++)
 				{
-					uartrecvalue[i-1] = receive_data[i];
+					au8_uartrecvalue[i-1] = au8_receive_data[i];
 				}
 		}
 	}
@@ -1009,205 +1007,205 @@ void Process_data(void)
 //---------------------------------------------------------------------------------
 //-------------------------- MODE: 000 | DIGITAL OUTPUT ---------------------------
 //---------------------------------------------------------------------------------
-				if(uartrecvalue[0]=='0'&&uartrecvalue[1]=='0'&&uartrecvalue[2]=='0')
+				if(au8_uartrecvalue[0]=='0'&&au8_uartrecvalue[1]=='0'&&au8_uartrecvalue[2]=='0')
 				{
-					mode_000_flag=1;
-					if (uartrecvalue[3] == 0x7A)
+					u8_mode_000_flag=1;
+					if (au8_uartrecvalue[3] == 0x7A)
 						{
 						HAL_GPIO_WritePin(GPIOA,GPIO_PIN_0,1);
-						memset(data_TX, 0, sizeof(data_TX));
-						sprintf((char*)data_TX,"%c%c%s",bSTX,'A',data_trans1);
-						data_TX[62] = bETX;
-						CDC_Transmit_FS(data_TX,sizeof(data_TX));
+						memset(au8_data_TX, 0, sizeof(au8_data_TX));
+						sprintf((char*)au8_data_TX,"%c%c%s",bSTX,'A',au8_data_trans1);
+						au8_data_TX[62] = bETX;
+						CDC_Transmit_FS(au8_data_TX,sizeof(au8_data_TX));
 						}
-					else if (uartrecvalue[3] == 0x7B)
+					else if (au8_uartrecvalue[3] == 0x7B)
 						{
 						HAL_GPIO_WritePin(GPIOA,GPIO_PIN_0,0);
-						memset(data_TX, 0, sizeof(data_TX));
-						sprintf((char*)data_TX,"%c%c%s",bSTX,'A',data_trans11);
-						data_TX[62] = bETX;							
-						CDC_Transmit_FS(data_TX,sizeof(data_TX));
+						memset(au8_data_TX, 0, sizeof(au8_data_TX));
+						sprintf((char*)au8_data_TX,"%c%c%s",bSTX,'A',au8_data_trans11);
+						au8_data_TX[62] = bETX;							
+						CDC_Transmit_FS(au8_data_TX,sizeof(au8_data_TX));
 						}
-					if (uartrecvalue[4] == 0x7A)
+					if (au8_uartrecvalue[4] == 0x7A)
 						{
 						HAL_GPIO_WritePin(GPIOA,GPIO_PIN_1,1);
-						memset(data_TX, 0, sizeof(data_TX));
-						sprintf((char*)data_TX,"%c%c%s",bSTX,'A',data_trans2);
-						data_TX[62] = bETX;
-						CDC_Transmit_FS(data_TX,sizeof(data_TX));
+						memset(au8_data_TX, 0, sizeof(au8_data_TX));
+						sprintf((char*)au8_data_TX,"%c%c%s",bSTX,'A',au8_data_trans2);
+						au8_data_TX[62] = bETX;
+						CDC_Transmit_FS(au8_data_TX,sizeof(au8_data_TX));
 						}
-					else if (uartrecvalue[4] == 0x7B)
+					else if (au8_uartrecvalue[4] == 0x7B)
 						{
 						HAL_GPIO_WritePin(GPIOA,GPIO_PIN_1,0);
-						memset(data_TX, 0, sizeof(data_TX));
-						sprintf((char*)data_TX,"%c%c%s",bSTX,'A',data_trans22);
-						data_TX[62] = bETX;
-						CDC_Transmit_FS(data_TX,sizeof(data_TX));
+						memset(au8_data_TX, 0, sizeof(au8_data_TX));
+						sprintf((char*)au8_data_TX,"%c%c%s",bSTX,'A',au8_data_trans22);
+						au8_data_TX[62] = bETX;
+						CDC_Transmit_FS(au8_data_TX,sizeof(au8_data_TX));
 						}
-					if (uartrecvalue[5] == 0x7A)
+					if (au8_uartrecvalue[5] == 0x7A)
 						{
 						HAL_GPIO_WritePin(GPIOA,GPIO_PIN_2,1);
-						memset(data_TX, 0, sizeof(data_TX));
-						sprintf((char*)data_TX,"%c%c%s",bSTX,'A',data_trans3);
-						data_TX[62] = bETX;
-						CDC_Transmit_FS(data_TX,sizeof(data_TX));
+						memset(au8_data_TX, 0, sizeof(au8_data_TX));
+						sprintf((char*)au8_data_TX,"%c%c%s",bSTX,'A',au8_data_trans3);
+						au8_data_TX[62] = bETX;
+						CDC_Transmit_FS(au8_data_TX,sizeof(au8_data_TX));
 						}
-					else if (uartrecvalue[5] == 0x7B)
+					else if (au8_uartrecvalue[5] == 0x7B)
 						{
 						HAL_GPIO_WritePin(GPIOA,GPIO_PIN_2,0);
-						memset(data_TX, 0, sizeof(data_TX));
-						sprintf((char*)data_TX,"%c%c%s",bSTX,'A',data_trans33);
-						data_TX[62] = bETX;
-						CDC_Transmit_FS(data_TX,sizeof(data_TX));
+						memset(au8_data_TX, 0, sizeof(au8_data_TX));
+						sprintf((char*)au8_data_TX,"%c%c%s",bSTX,'A',au8_data_trans33);
+						au8_data_TX[62] = bETX;
+						CDC_Transmit_FS(au8_data_TX,sizeof(au8_data_TX));
 						}
 				}
 //---------------------------------------------------------------------------------
 //----------------------------- MODE: 001 | PWM MOTOR -----------------------------
 //---------------------------------------------------------------------------------
-				if(uartrecvalue[0]=='0'&&uartrecvalue[1]=='0'&&uartrecvalue[2]=='1')
+				if(au8_uartrecvalue[0]=='0'&&au8_uartrecvalue[1]=='0'&&au8_uartrecvalue[2]=='1')
 				{
-					if(uartrecvalue[3]>='0'&&uartrecvalue[3]<='9'
-						&&uartrecvalue[4]>='0'&&uartrecvalue[4]<='9'
-						&&uartrecvalue[5]>='0'&&uartrecvalue[5]<='9')
+					if(au8_uartrecvalue[3]>='0'&&au8_uartrecvalue[3]<='9'
+						&&au8_uartrecvalue[4]>='0'&&au8_uartrecvalue[4]<='9'
+						&&au8_uartrecvalue[5]>='0'&&au8_uartrecvalue[5]<='9')
 					{
-						mode_001_flag = 1;
-						data_RX[0] = uartrecvalue[3];
-						data_RX[1] = uartrecvalue[4];
-						data_RX[2] = uartrecvalue[5];
+						u8_mode_001_flag = 1;
+						au8_data_RX[0] = au8_uartrecvalue[3];
+						au8_data_RX[1] = au8_uartrecvalue[4];
+						au8_data_RX[2] = au8_uartrecvalue[5];
 					}
 				}
 //---------------------------------------------------------------------------------
 //------------------------- MODE: 010 | POSITION NONE PID -------------------------
 //---------------------------------------------------------------------------------
-				if(uartrecvalue[0]=='0'&&uartrecvalue[1]=='1'&&uartrecvalue[2]=='0')
+				if(au8_uartrecvalue[0]=='0'&&au8_uartrecvalue[1]=='1'&&au8_uartrecvalue[2]=='0')
 				{
-					mode_010_flag =1;
-					data_Poi[0] = uartrecvalue[3];
-					data_Poi[1] = uartrecvalue[4];
-					data_Poi[2] = uartrecvalue[5];		
+					u8_mode_010_flag =1;
+					au8_data_Poi[0] = au8_uartrecvalue[3];
+					au8_data_Poi[1] = au8_uartrecvalue[4];
+					au8_data_Poi[2] = au8_uartrecvalue[5];		
 					HAL_TIM_Base_Start_IT(&htim4);
-					data_counter=0;
-					page_counter=0;
+					u16_data_counter=0;
+					u8_page_counter=0;
 				}
 //---------------------------------------------------------------------------------
 //--------------------------- MODE: 011 | POSITION PID ----------------------------
 //---------------------------------------------------------------------------------								
-				if(uartrecvalue[0]=='0'&&uartrecvalue[1]=='1'&&uartrecvalue[2]=='1')
+				if(au8_uartrecvalue[0]=='0'&&au8_uartrecvalue[1]=='1'&&au8_uartrecvalue[2]=='1')
 				{
-					mode_011_flag = 1;
+					u8_mode_011_flag = 1;
 					uint8_t index=0;
 					uint8_t index_buff =0;
 					for(uint8_t i=3; i<32;i++)
 					{
-						if (uartrecvalue[i] == '/' || uartrecvalue[i] == '\0')
+						if (au8_uartrecvalue[i] == '/' || au8_uartrecvalue[i] == '\0')
 						{
-								data_PID_buff[index_buff] = '\0';
-								data_PID[index] = atof((char*)data_PID_buff);
+								au8_data_PID_buff[index_buff] = '\0';
+								f_data_PID[index] = atof((char*)au8_data_PID_buff);
 								index++;
-								memset(data_PID_buff, 0, sizeof(data_PID_buff));
+								memset(au8_data_PID_buff, 0, sizeof(au8_data_PID_buff));
 								index_buff = 0;
-								if (uartrecvalue[i] == '\0') break;
+								if (au8_uartrecvalue[i] == '\0') break;
 						}
 						else
 						{
-								data_PID_buff[index_buff] = uartrecvalue[i];
+								au8_data_PID_buff[index_buff] = au8_uartrecvalue[i];
 								index_buff++;
 						}
 					}
 					if (index < 3 && index_buff > 0)
 					{
-							data_PID_buff[index_buff] = '\0';
-							data_PID[index] = atof((char*)data_PID_buff);
+							au8_data_PID_buff[index_buff] = '\0';
+							f_data_PID[index] = atof((char*)au8_data_PID_buff);
 					}
-					f_Kp = data_PID[0];
-					f_Ki = data_PID[1];
-					f_Kd = data_PID[2];
+					f_Kp = f_data_PID[0];
+					f_Ki = f_data_PID[1];
+					f_Kd = f_data_PID[2];
 					
 					HAL_TIM_Base_Start_IT(&htim4);
-					data_counter=0;
-					page_counter=0;
+					u16_data_counter=0;
+					u8_page_counter=0;
 				}
 				
 //---------------------------------------------------------------------------------
 //------------------------ MODE: 012 | GET DATA POSITION --------------------------
 //---------------------------------------------------------------------------------
-				if(uartrecvalue[0]=='0'&&uartrecvalue[1]=='1'&&uartrecvalue[2]=='2')
+				if(au8_uartrecvalue[0]=='0'&&au8_uartrecvalue[1]=='1'&&au8_uartrecvalue[2]=='2')
 				{
-					mode_012_flag = 1;
+					u8_mode_012_flag = 1;
 				}
 //---------------------------------------------------------------------------------
 //--------------------------- MODE: 013 | RESET COUNTER ---------------------------
 //---------------------------------------------------------------------------------
-				if(uartrecvalue[0]=='0'&&uartrecvalue[1]=='1'&&uartrecvalue[2]=='3')
+				if(au8_uartrecvalue[0]=='0'&&au8_uartrecvalue[1]=='1'&&au8_uartrecvalue[2]=='3')
 				{
-					mode_013_flag = 1;
+					u8_mode_013_flag = 1;
 					__HAL_TIM_SET_COUNTER(&htim2,0);
 				}
 //---------------------------------------------------------------------------------
 //---------------------------- MODE: 014 | CALIBRATION ----------------------------
 //---------------------------------------------------------------------------------			
-				if(uartrecvalue[0]=='0'&&uartrecvalue[1]=='1'&&uartrecvalue[2]=='4')
+				if(au8_uartrecvalue[0]=='0'&&au8_uartrecvalue[1]=='1'&&au8_uartrecvalue[2]=='4')
 				{
-					mode_014_flag = 1;		
-					if(uartrecvalue[3] == '1')
+					u8_mode_014_flag = 1;		
+					if(au8_uartrecvalue[3] == '1')
 					{
-						zero_calib = 1;
-						receive_data[4]=0;
+						u8_zero_calib = 1;
+						au8_receive_data[4]=0;
 					}
-					else if(uartrecvalue[3] == '2')
+					else if(au8_uartrecvalue[3] == '2')
 					{
-						span_calib = 1;
-						receive_data[4]=0;
+						u8_span_calib = 1;
+						au8_receive_data[4]=0;
 					}
 				}
 //---------------------------------------------------------------------------------
 //------------------------------ MODE: 020 | LED RGB ------------------------------
 //---------------------------------------------------------------------------------			
-				if(uartrecvalue[0]=='0'&&uartrecvalue[1]=='2'&&uartrecvalue[2]=='0')
+				if(au8_uartrecvalue[0]=='0'&&au8_uartrecvalue[1]=='2'&&au8_uartrecvalue[2]=='0')
 				{
-					if(uartrecvalue[4]>='0'&&uartrecvalue[4]<='9'
-						&&uartrecvalue[5]>='0'&&uartrecvalue[5]<='9'
-						&&uartrecvalue[6]>='0'&&uartrecvalue[6]<='9')
+					if(au8_uartrecvalue[4]>='0'&&au8_uartrecvalue[4]<='9'
+						&&au8_uartrecvalue[5]>='0'&&au8_uartrecvalue[5]<='9'
+						&&au8_uartrecvalue[6]>='0'&&au8_uartrecvalue[6]<='9')
 					{
-						mode_020_flag = 1;
-						color_led = uartrecvalue[3];
-						data_led[0] = uartrecvalue[4];
-						data_led[1] = uartrecvalue[5];
-						data_led[2] = uartrecvalue[6];
+						u8_mode_020_flag = 1;
+						u8_color_led = au8_uartrecvalue[3];
+						au8_data_led[0] = au8_uartrecvalue[4];
+						au8_data_led[1] = au8_uartrecvalue[5];
+						au8_data_led[2] = au8_uartrecvalue[6];
 					}
 				}				
 //---------------------------------------------------------------------------------
 //----------------------------- MODE: 021 | DAC VALUE -----------------------------
 //---------------------------------------------------------------------------------			
-				if(uartrecvalue[0]=='0'&&uartrecvalue[1]=='2'&&uartrecvalue[2]=='1')
+				if(au8_uartrecvalue[0]=='0'&&au8_uartrecvalue[1]=='2'&&au8_uartrecvalue[2]=='1')
 				{
-					mode_021_flag = 1;
-					data_DAC[0] = uartrecvalue[4];
-					data_DAC[1] = uartrecvalue[5];
-					data_DAC[2] = uartrecvalue[6];
-					data_DAC[3] = uartrecvalue[7];		
-					SRAM_Flag = uartrecvalue[3] - 0x30;
-					if(SRAM_Flag == 1)
+					u8_mode_021_flag = 1;
+					au8_data_DAC[0] = au8_uartrecvalue[4];
+					au8_data_DAC[1] = au8_uartrecvalue[5];
+					au8_data_DAC[2] = au8_uartrecvalue[6];
+					au8_data_DAC[3] = au8_uartrecvalue[7];		
+					u8_SRAM_Flag = au8_uartrecvalue[3] - 0x30;
+					if(u8_SRAM_Flag == 1)
 					{
 						for (uint8_t addr = 0; addr < 4; addr++) 
 						{
-							SRAM_WriteByte(addr, data_DAC[addr]);  
+							SRAM_WriteByte(addr, au8_data_DAC[addr]);  
 						}	
 					}	
 				}
 //---------------------------------------------------------------------------------
 //---------------------------- MODE: 022 | PT100 VALUE ----------------------------
 //---------------------------------------------------------------------------------			
-				if(uartrecvalue[0]=='0'&&uartrecvalue[1]=='2'&&uartrecvalue[2]=='2')
+				if(au8_uartrecvalue[0]=='0'&&au8_uartrecvalue[1]=='2'&&au8_uartrecvalue[2]=='2')
 				{
-					if(uartrecvalue[3]=='1')
+					if(au8_uartrecvalue[3]=='1')
 					{
-						mode_022_flag=1;
+						u8_mode_022_flag=1;
 						HAL_TIM_Base_Start_IT(&htim3);
 					}
-					else if(uartrecvalue[3]=='2')
+					else if(au8_uartrecvalue[3]=='2')
 					{
-						mode_022_flag=0;
+						u8_mode_022_flag=0;
 						HAL_TIM_Base_Stop_IT(&htim3);
 
 					}
@@ -1219,10 +1217,10 @@ void Process_data(void)
 //---------------------------------------------------------------------------------
 void PT100_ADC(void)
 {
-		memset(data_TX, 0, sizeof(data_TX));
-		sprintf((char*)data_TX,"%c%c%u",bSTX,'T',PT100_value);
-		data_TX[6] = bETX;
-		CDC_Transmit_FS(data_TX,7);	
+		memset(au8_data_TX, 0, sizeof(au8_data_TX));
+		sprintf((char*)au8_data_TX,"%c%c%u",bSTX,'T',u32_PT100_value);
+		au8_data_TX[6] = bETX;
+		CDC_Transmit_FS(au8_data_TX,7);	
 }
 
 
@@ -1232,11 +1230,11 @@ void PT100_ADC(void)
 //---------------------------------------------------------------------------------
 void MAX7219_SendData(uint8_t address, uint8_t data)
 {
-    spi_buffer[0] = address;  
-    spi_buffer[1] = data;     
+    au8_spi_buffer[0] = address;  
+    au8_spi_buffer[1] = data;     
 
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET); 
-    HAL_SPI_Transmit(&hspi1, spi_buffer, 2, 1);
+    HAL_SPI_Transmit(&hspi1, au8_spi_buffer, 2, 1);
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);  
 }
 
@@ -1267,50 +1265,50 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	if(htim == &htim4)
 	{	
-		if(mode_010_flag || mode_011_flag)
+		if(u8_mode_010_flag || u8_mode_011_flag)
 		{
-			data_counter++;	
-			pulse = __HAL_TIM_GET_COUNTER(&htim2);
-			//MAX7219_SendData(4, pulse/1000);
-			//MAX7219_SendData(3, (pulse/100)%10);
-			//MAX7219_SendData(2, (pulse/10)%10);
-			//MAX7219_SendData(1, pulse%10);
-			sprintf(data_array, "%04d",pulse);
-			if(data_counter <= 150)
+			u16_data_counter++;	
+			s16_pulse = __HAL_TIM_GET_COUNTER(&htim2);
+			//MAX7219_SendData(4, s16_pulse/1000);
+			//MAX7219_SendData(3, (s16_pulse/100)%10);
+			//MAX7219_SendData(2, (s16_pulse/10)%10);
+			//MAX7219_SendData(1, s16_pulse%10);
+			sprintf(achr_data_array, "%04d",s16_pulse);
+			if(u16_data_counter <= 150)
 			{
-				memcpy(&data_motor_write[data_pointer],data_array,4);
-				data_pointer+=4;
-				if(data_counter % 15 ==0)
+				memcpy(&au8_data_motor_write[u8_data_pointer],achr_data_array,4);
+				u8_data_pointer+=4;
+				if(u16_data_counter % 15 ==0)
 				{
-					HAL_I2C_Mem_Write(&hi2c1, EEPROM_ADDR, page_counter, 2, data_motor_write, sizeof(data_motor_write), 1000);
-					page_counter+=64;
-					data_pointer=0;
-					page_index++;
-					memset(data_motor_write, 0, sizeof(data_motor_write));
+					HAL_I2C_Mem_Write(&hi2c1, EEPROM_ADDR, u8_page_counter, 2, au8_data_motor_write, sizeof(au8_data_motor_write), 1000);
+					u8_page_counter+=64;
+					u8_data_pointer=0;
+					u8_page_index++;
+					memset(au8_data_motor_write, 0, sizeof(au8_data_motor_write));
 				}
 			}
 		}
-		if(mode_011_flag)
+		if(u8_mode_011_flag)
 		{
-			f_Err_Now = calibrated_pulse - f_Mea_Now;
+			f_Err_Now = s16_calibrated_pulse - f_Mea_Now;
 			f_Int = f_Int + (f_Err_Now * f_Del);
 			f_Der = (f_Err_Now - f_Err_Pre) / f_Del;
-			output = (f_Kp * f_Err_Now) + (f_Ki * f_Int) + (f_Kd * f_Der);
-			if (output > 100) output = 100;
-			if (output < -100) output = -100;
+			f_output = (f_Kp * f_Err_Now) + (f_Ki * f_Int) + (f_Kd * f_Der);
+			if (f_output > 100) f_output = 100;
+			if (f_output < -100) f_output = -100;
 			f_Err_Pre = f_Err_Now;
-			if(output >= 0) Forward_Turning(output*(999/100));
-			else if(output < 0) Reverse_Turning(-output*(999/100));
+			if(f_output >= 0) Forward_Turning(f_output*(999/100));
+			else if(f_output < 0) Reverse_Turning(-f_output*(999/100));
 			else Stop_Turning();
 		}
 	}
 	if(htim == &htim3)
 	{
-		PT100_index ++;
-		if(PT100_index == 500)
+		u16_PT100_index ++;
+		if(u16_PT100_index == 500)
 			{
 				PT100_ADC();
-				PT100_index = 0;
+				u16_PT100_index = 0;
 			}
 	}
 }
